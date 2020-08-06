@@ -28,6 +28,7 @@ public class LineAcceptanceStep {
         params.put("startTime", LocalTime.of(05, 30).format(DateTimeFormatter.ISO_TIME));
         params.put("endTime", LocalTime.of(23, 30).format(DateTimeFormatter.ISO_TIME));
         params.put("intervalTime", "5");
+        params.put("extraFee", String.valueOf(100));
 
         return RestAssured.given().log().all().
                 contentType(MediaType.APPLICATION_JSON_VALUE).
@@ -80,6 +81,7 @@ public class LineAcceptanceStep {
         params.put("startTime", LocalTime.of(05, 30).format(DateTimeFormatter.ISO_TIME));
         params.put("endTime", LocalTime.of(23, 30).format(DateTimeFormatter.ISO_TIME));
         params.put("intervalTime", "5");
+        params.put("extraFee", String.valueOf(100));
 
         return RestAssured.given().log().all().
                 contentType(MediaType.APPLICATION_JSON_VALUE).
