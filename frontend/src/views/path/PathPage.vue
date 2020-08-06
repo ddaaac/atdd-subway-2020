@@ -220,6 +220,7 @@ export default {
     ...mapActions([SEARCH_PATH, FETCH_STATIONS]),
     async onSearchResult() {
       try {
+        this.$store.dispatch("searchPath", {source: this.path.source, target: this.path.target, type: this.path.type})
       } catch (e) {
         this.showSnackbar(SNACKBAR_MESSAGES.COMMON.FAIL)
         console.error(e)
