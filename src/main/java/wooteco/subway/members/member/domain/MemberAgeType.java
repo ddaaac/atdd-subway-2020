@@ -28,7 +28,7 @@ public enum MemberAgeType {
             .orElseThrow(AssertionError::new);
     }
 
-    public int calculateFare(int fare) {
+    public int reviseFare(int fare) {
         return discountPolicy.apply(fare);
     }
 }

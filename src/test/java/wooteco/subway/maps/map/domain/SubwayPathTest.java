@@ -101,7 +101,7 @@ class SubwayPathTest {
 
         int fare = subwayPath.calculateFare(extraFares, MemberAgeType.ADULT);
 
-        assertThat(fare).isEqualTo(2350);
+        assertThat(fare).isEqualTo(2150);
     }
 
     @DisplayName("노선 추가 운임")

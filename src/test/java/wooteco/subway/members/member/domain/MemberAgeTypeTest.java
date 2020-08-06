@@ -22,7 +22,7 @@ class MemberAgeTypeTest {
 
         assertAll(
             () -> assertThat(loginMemberAgeType).isEqualTo(expectedType),
-            () -> assertThat(loginMemberAgeType.calculateFare(fare)).isEqualTo(expectedFare)
+            () -> assertThat(loginMemberAgeType.reviseFare(fare)).isEqualTo(expectedFare)
         );
     }
 

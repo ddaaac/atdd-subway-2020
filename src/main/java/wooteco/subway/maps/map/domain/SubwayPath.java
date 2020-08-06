@@ -8,6 +8,14 @@ import com.google.common.collect.Lists;
 import wooteco.subway.members.member.domain.MemberAgeType;
 
 public class SubwayPath {
+    private static final int ZERO = 0;
+    private static final int FIFTY = 50;
+    private static final int TEN = 10;
+    private static final int OVER_FIFTY_EXTRA_FARE_UNIT = 8;
+    private static final int OVER_TEN_EXTRA_FARE_UNIT = 5;
+    private static final int DEFAULT_FARE = 1250;
+    private static final int EXTRA_FARE_MULTIPLE = 100;
+
     private List<LineStationEdge> lineStationEdges;
 
     public SubwayPath(List<LineStationEdge> lineStationEdges) {
@@ -37,13 +45,13 @@ public class SubwayPath {
 
     public int calculateFare(Map<Long, Integer> extraFares, MemberAgeType memberType) {
         int total = calculateDistanceFare();
-        total += calculateExtraFare(extraFares);
-        total = memberType.calculateFare(total);
+        total += calculateExtraFareByLine(extraFares);
+        total = memberType.reviseFare(total);
 
         return total;
     }
 
-    private int calculateExtraFare(final Map<Long, Integer> extraFares) {
+    private int calculateExtraFareByLine(final Map<Long, Integer> extraFares) {
         return lineStationEdges.stream()
             .mapToInt(it -> extraFares.get(it.getLineId()))
             .max()
@@ -52,16 +60,27 @@ public class SubwayPath {
 
     private int calculateDistanceFare() {
         int distance = calculateDistance();
-        int total = 0;
+        int totalFare = ZERO;
 
-        if (distance > 50) {
-            total += ((distance - 50) / 8 + 1) * 100;
+        if (distance > FIFTY) {
+            totalFare += getExtraFare(distance - FIFTY, OVER_FIFTY_EXTRA_FARE_UNIT);
         }
-        if (distance > 10) {
-            int extraDistance = distance > 50 ? 40 : (distance - 10);
-            total += (extraDistance / 5 + 1) * 100;
+        if (distance > TEN) {
+            int extraDistance = getExtra10FareDistance(distance);
+            totalFare += getExtraFare(extraDistance, OVER_TEN_EXTRA_FARE_UNIT);
         }
-        total += 1250;
-        return total;
+        totalFare += DEFAULT_FARE;
+        return totalFare;
+    }
+
+    private int getExtraFare(int extraDistance, int unit) {
+        return ((extraDistance - 1) / unit + 1) * EXTRA_FARE_MULTIPLE;
+    }
+
+    private int getExtra10FareDistance(int distance) {
+        if (distance > FIFTY) {
+            return FIFTY - TEN;
+        }
+        return distance - TEN;
     }
 }
