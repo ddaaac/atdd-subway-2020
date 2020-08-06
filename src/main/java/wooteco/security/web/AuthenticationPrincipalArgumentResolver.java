@@ -1,16 +1,17 @@
 package wooteco.security.web;
 
+import java.util.Arrays;
+import java.util.Map;
+
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+
 import wooteco.security.core.Authentication;
 import wooteco.security.core.AuthenticationPrincipal;
 import wooteco.security.core.context.SecurityContextHolder;
-
-import java.util.Arrays;
-import java.util.Map;
 
 public class AuthenticationPrincipalArgumentResolver implements HandlerMethodArgumentResolver {
     @Override
@@ -19,10 +20,17 @@ public class AuthenticationPrincipalArgumentResolver implements HandlerMethodArg
     }
 
     @Override
-    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
+    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
+        NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        AuthenticationPrincipal principal = parameter.getParameterAnnotation(AuthenticationPrincipal.class);
         if (authentication == null) {
-            throw new AuthorizationException();
+            if (principal.required()) {
+                throw new AuthorizationException();
+            } else { // 로그인을 안해도 되는 경우, null을 리턴
+                return null;
+            }
         }
         if (authentication.getPrincipal() instanceof Map) {
             return extractPrincipal(parameter, authentication);
@@ -33,11 +41,11 @@ public class AuthenticationPrincipalArgumentResolver implements HandlerMethodArg
 
     private Object extractPrincipal(MethodParameter parameter, Authentication authentication) {
         try {
-            Map<String, String> principal = (Map) authentication.getPrincipal();
+            Map<String, String> principal = (Map)authentication.getPrincipal();
 
             Object[] params = Arrays.stream(parameter.getParameterType().getDeclaredFields())
-                    .map(it -> toObject(it.getType(), principal.get(it.getName())))
-                    .toArray();
+                .map(it -> toObject(it.getType(), principal.get(it.getName())))
+                .toArray();
 
             return parameter.getParameterType().getConstructors()[0].newInstance(params);
         } catch (Exception e) {
@@ -46,13 +54,20 @@ public class AuthenticationPrincipalArgumentResolver implements HandlerMethodArg
     }
 
     public static Object toObject(Class clazz, String value) {
-        if (Boolean.class == clazz) return Boolean.parseBoolean(value);
-        if (Byte.class == clazz) return Byte.parseByte(value);
-        if (Short.class == clazz) return Short.parseShort(value);
-        if (Integer.class == clazz) return Integer.parseInt(value);
-        if (Long.class == clazz) return Long.parseLong(value);
-        if (Float.class == clazz) return Float.parseFloat(value);
-        if (Double.class == clazz) return Double.parseDouble(value);
+        if (Boolean.class == clazz)
+            return Boolean.parseBoolean(value);
+        if (Byte.class == clazz)
+            return Byte.parseByte(value);
+        if (Short.class == clazz)
+            return Short.parseShort(value);
+        if (Integer.class == clazz)
+            return Integer.parseInt(value);
+        if (Long.class == clazz)
+            return Long.parseLong(value);
+        if (Float.class == clazz)
+            return Float.parseFloat(value);
+        if (Double.class == clazz)
+            return Double.parseDouble(value);
         return value;
     }
 }

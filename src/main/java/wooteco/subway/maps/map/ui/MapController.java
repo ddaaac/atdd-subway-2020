@@ -1,13 +1,16 @@
 package wooteco.subway.maps.map.ui;
 
-import wooteco.subway.maps.map.application.MapService;
-import wooteco.subway.maps.map.domain.PathType;
-import wooteco.subway.maps.map.dto.MapResponse;
-import wooteco.subway.maps.map.dto.PathResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import wooteco.security.core.AuthenticationPrincipal;
+import wooteco.subway.maps.map.application.MapService;
+import wooteco.subway.maps.map.domain.PathType;
+import wooteco.subway.maps.map.dto.MapResponse;
+import wooteco.subway.maps.map.dto.PathResponse;
+import wooteco.subway.members.member.domain.LoginMember;
 
 @RestController
 public class MapController {
@@ -18,9 +21,10 @@ public class MapController {
     }
 
     @GetMapping("/paths")
-    public ResponseEntity<PathResponse> findPath(@RequestParam Long source, @RequestParam Long target,
-                                                 @RequestParam PathType type) {
-        return ResponseEntity.ok(mapService.findPath(source, target, type));
+    public ResponseEntity<PathResponse> findPath(
+        @RequestParam("source") Long source, @RequestParam("target") Long target, @RequestParam("type") PathType type,
+        @AuthenticationPrincipal(required = false) LoginMember loginMember) {
+        return ResponseEntity.ok(mapService.findPath(loginMember, source, target, type));
     }
 
     @GetMapping("/maps")
