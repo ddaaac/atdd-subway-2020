@@ -207,7 +207,7 @@ export default {
   computed: {
     ...mapGetters(['stations', 'pathResult']),
     getCurrentTime() {
-      const today = new Date()
+      const today = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Seoul"}))
       const hour = today.getHours()
       const dayTime = hour > 12 ? 'pm' : 'am'
       const minute = today.getMinutes()
@@ -223,7 +223,18 @@ export default {
     ...mapActions([SEARCH_PATH, FETCH_STATIONS]),
     async onSearchResult() {
       try {
-        this.$store.dispatch("searchPath", {source: this.path.source, target: this.path.target, type: this.path.type})
+        if (this.path.type === this.PATH_TYPE.ARRIVAL_TIME) {
+          const today = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Seoul"}))
+          const hour = this.departureTimeView.hour
+          const minute = this.departureTimeView.minute
+          const year = today.getFullYear();
+          const month = today.getMonth() < 9 ? `0${today.getMonth() + 1}` : today.getMonth() + 1;
+          const day = today.getDate() < 9 ? `0${today.getDate()}` : today.getDate();
+          const time = year + month + day + hour + minute
+          this.searchPath({...this.path, time})
+        } else {
+          this.searchPath(this.path)
+        }
       } catch (e) {
         this.showSnackbar(SNACKBAR_MESSAGES.COMMON.FAIL)
         console.error(e)
