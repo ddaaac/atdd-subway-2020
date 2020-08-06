@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
+import wooteco.subway.members.member.domain.MemberAgeType;
 
 public class SubwayPath {
     private List<LineStationEdge> lineStationEdges;
@@ -34,9 +35,10 @@ public class SubwayPath {
         return lineStationEdges.stream().mapToInt(it -> it.getLineStation().getDistance()).sum();
     }
 
-    public int calculateFare(Map<Long, Integer> extraFares) {
+    public int calculateFare(Map<Long, Integer> extraFares, MemberAgeType memberType) {
         int total = calculateDistanceFare();
         total += calculateExtraFare(extraFares);
+        total = memberType.calculateFare(total);
 
         return total;
     }

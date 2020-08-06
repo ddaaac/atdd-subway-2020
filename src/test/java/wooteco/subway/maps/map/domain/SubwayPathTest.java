@@ -15,6 +15,7 @@ import com.google.common.collect.Lists;
 import wooteco.subway.common.TestObjectUtils;
 import wooteco.subway.maps.line.domain.Line;
 import wooteco.subway.maps.line.domain.LineStation;
+import wooteco.subway.members.member.domain.MemberAgeType;
 
 class SubwayPathTest {
     private List<LineStation> lineStations;
@@ -70,7 +71,7 @@ class SubwayPathTest {
         );
         SubwayPath subwayPath = new SubwayPath(lineStationEdges);
 
-        int fare = subwayPath.calculateFare(extraFares);
+        int fare = subwayPath.calculateFare(extraFares, MemberAgeType.ADULT);
 
         assertThat(fare).isEqualTo(1250);
     }
@@ -84,7 +85,7 @@ class SubwayPathTest {
         );
         SubwayPath subwayPath = new SubwayPath(lineStationEdges);
 
-        int fare = subwayPath.calculateFare(extraFares);
+        int fare = subwayPath.calculateFare(extraFares, MemberAgeType.ADULT);
 
         assertThat(fare).isEqualTo(1350);
     }
@@ -98,7 +99,7 @@ class SubwayPathTest {
         );
         SubwayPath subwayPath = new SubwayPath(lineStationEdges);
 
-        int fare = subwayPath.calculateFare(extraFares);
+        int fare = subwayPath.calculateFare(extraFares, MemberAgeType.ADULT);
 
         assertThat(fare).isEqualTo(2350);
     }
@@ -113,8 +114,23 @@ class SubwayPathTest {
         );
         SubwayPath subwayPath = new SubwayPath(lineStationEdges);
 
-        int fare = subwayPath.calculateFare(extraFares);
+        int fare = subwayPath.calculateFare(extraFares, MemberAgeType.ADULT);
 
         assertThat(fare).isEqualTo(3250);
+    }
+
+    @DisplayName("나이에 따라 다른 요금")
+    @Test
+    void ageFare() {
+        List<LineStationEdge> lineStationEdges = Lists.newArrayList(
+            new LineStationEdge(lineStations.get(7), lines.get(3).getId()),
+            new LineStationEdge(lineStations.get(8), lines.get(3).getId()),
+            new LineStationEdge(lineStations.get(9), lines.get(4).getId())
+        );
+        SubwayPath subwayPath = new SubwayPath(lineStationEdges);
+
+        int fare = subwayPath.calculateFare(extraFares, MemberAgeType.CHILD);
+
+        assertThat(fare).isEqualTo(1800);
     }
 }

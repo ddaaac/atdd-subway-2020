@@ -16,6 +16,7 @@ import wooteco.subway.maps.station.application.StationService;
 import wooteco.subway.maps.station.domain.Station;
 import wooteco.subway.maps.station.dto.StationResponse;
 import wooteco.subway.members.member.domain.LoginMember;
+import wooteco.subway.members.member.domain.MemberAgeType;
 
 import org.springframework.stereotype.Service;
 
@@ -53,8 +54,9 @@ public class MapService {
             .collect(Collectors.toMap(Line::getId, Line::getExtraFare));
         SubwayPath subwayPath = pathService.findPath(lines, source, target, type);
         Map<Long, Station> stations = stationService.findStationsByIds(subwayPath.extractStationId());
+        MemberAgeType memberType = MemberAgeType.getLoginMemberAgeType(loginMember);
 
-        return PathResponseAssembler.assemble(subwayPath, stations, extraFares);
+        return PathResponseAssembler.assemble(subwayPath, stations, extraFares, memberType);
     }
 
     private Map<Long, Station> findStations(List<Line> lines) {
