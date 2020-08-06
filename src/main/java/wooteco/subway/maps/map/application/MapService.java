@@ -1,5 +1,7 @@
 package wooteco.subway.maps.map.application;
 
+import static org.springframework.data.util.Pair.*;
+
 import org.springframework.transaction.annotation.Transactional;
 import wooteco.subway.maps.line.application.LineService;
 import wooteco.subway.maps.line.domain.Line;
@@ -45,10 +47,12 @@ public class MapService {
 
     public PathResponse findPath(Long source, Long target, PathType type) {
         List<Line> lines = lineService.findLines();
+        Map<Long, Integer> extraFares = lines.stream()
+            .collect(Collectors.toMap(Line::getId, Line::getExtraFare));
         SubwayPath subwayPath = pathService.findPath(lines, source, target, type);
         Map<Long, Station> stations = stationService.findStationsByIds(subwayPath.extractStationId());
 
-        return PathResponseAssembler.assemble(subwayPath, stations);
+        return PathResponseAssembler.assemble(subwayPath, stations, extraFares);
     }
 
     private Map<Long, Station> findStations(List<Line> lines) {
