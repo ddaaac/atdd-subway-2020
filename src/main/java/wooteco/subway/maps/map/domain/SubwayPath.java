@@ -43,44 +43,10 @@ public class SubwayPath {
         return lineStationEdges.stream().mapToInt(it -> it.getLineStation().getDistance()).sum();
     }
 
-    public int calculateFare(Map<Long, Integer> extraFares, MemberAgeType memberType) {
-        int total = calculateDistanceFare();
-        total += calculateExtraFareByLine(extraFares);
-        total = memberType.reviseFare(total);
-
-        return total;
-    }
-
-    private int calculateExtraFareByLine(final Map<Long, Integer> extraFares) {
+    public int getMaxExtraFare(final Map<Long, Integer> extraFares) {
         return lineStationEdges.stream()
             .mapToInt(it -> extraFares.get(it.getLineId()))
             .max()
             .orElseThrow(() -> new RuntimeException("Line이 존재하지 않습니다."));
-    }
-
-    private int calculateDistanceFare() {
-        int distance = calculateDistance();
-        int totalFare = ZERO;
-
-        if (distance > FIFTY) {
-            totalFare += getExtraFare(distance - FIFTY, OVER_FIFTY_EXTRA_FARE_UNIT);
-        }
-        if (distance > TEN) {
-            int extraDistance = getExtra10FareDistance(distance);
-            totalFare += getExtraFare(extraDistance, OVER_TEN_EXTRA_FARE_UNIT);
-        }
-        totalFare += DEFAULT_FARE;
-        return totalFare;
-    }
-
-    private int getExtraFare(int extraDistance, int unit) {
-        return ((extraDistance - 1) / unit + 1) * EXTRA_FARE_MULTIPLE;
-    }
-
-    private int getExtra10FareDistance(int distance) {
-        if (distance > FIFTY) {
-            return FIFTY - TEN;
-        }
-        return distance - TEN;
     }
 }

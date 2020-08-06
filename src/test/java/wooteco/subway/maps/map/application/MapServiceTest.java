@@ -19,6 +19,7 @@ import wooteco.subway.common.TestObjectUtils;
 import wooteco.subway.maps.line.application.LineService;
 import wooteco.subway.maps.line.domain.Line;
 import wooteco.subway.maps.line.domain.LineStation;
+import wooteco.subway.maps.map.domain.FareCalculatorImpl;
 import wooteco.subway.maps.map.domain.LineStationEdge;
 import wooteco.subway.maps.map.domain.PathType;
 import wooteco.subway.maps.map.domain.SubwayPath;
@@ -77,7 +78,7 @@ public class MapServiceTest {
         );
         subwayPath = new SubwayPath(lineStations);
 
-        mapService = new MapService(lineService, stationService, pathService);
+        mapService = new MapService(lineService, stationService, pathService, new FareCalculatorImpl());
     }
 
     @Test

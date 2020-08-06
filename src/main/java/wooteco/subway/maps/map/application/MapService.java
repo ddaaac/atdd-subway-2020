@@ -1,12 +1,11 @@
 package wooteco.subway.maps.map.application;
 
-import static org.springframework.data.util.Pair.*;
-
 import org.springframework.transaction.annotation.Transactional;
 import wooteco.subway.maps.line.application.LineService;
 import wooteco.subway.maps.line.domain.Line;
 import wooteco.subway.maps.line.dto.LineResponse;
 import wooteco.subway.maps.line.dto.LineStationResponse;
+import wooteco.subway.maps.map.domain.FareCalculator;
 import wooteco.subway.maps.map.domain.PathType;
 import wooteco.subway.maps.map.domain.SubwayPath;
 import wooteco.subway.maps.map.dto.MapResponse;
@@ -30,11 +29,14 @@ public class MapService {
     private LineService lineService;
     private StationService stationService;
     private PathService pathService;
+    private FareCalculator fareCalculator;
 
-    public MapService(LineService lineService, StationService stationService, PathService pathService) {
+    public MapService(LineService lineService, StationService stationService, PathService pathService,
+        final FareCalculator fareCalculator) {
         this.lineService = lineService;
         this.stationService = stationService;
         this.pathService = pathService;
+        this.fareCalculator = fareCalculator;
     }
 
     public MapResponse findMap() {
@@ -56,7 +58,8 @@ public class MapService {
         Map<Long, Station> stations = stationService.findStationsByIds(subwayPath.extractStationId());
         MemberAgeType memberType = MemberAgeType.getLoginMemberAgeType(loginMember);
 
-        return PathResponseAssembler.assemble(subwayPath, stations, extraFares, memberType);
+        return new PathResponseAssembler(fareCalculator)
+            .assemble(subwayPath, stations, extraFares, memberType);
     }
 
     private Map<Long, Station> findStations(List<Line> lines) {
